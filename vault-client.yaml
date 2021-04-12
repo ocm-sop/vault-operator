@@ -8,7 +8,7 @@ spec:
   secret: thisreallyshouldbecomingfromvault
   public: false
   redirectURIs:
-    - "https://vault.apps.openshift-cluster-name.base-domain.tld/ui/vault/auth/oidc/oidc/callback"
+    - "https://vault.apps.keyring.cicd.red-chesterfield.coom/ui/vault/auth/oidc/oidc/callback"
     - "http://localhost:8250/oidc/callback"
     - "http://127.0.0.1:8250/oidc/callback"
   trustedPeers:

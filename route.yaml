@@ -1,0 +1,16 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: vault-route
+  namespace: vault
+spec:
+  host: vault.apps.keyring.cicd.red-chesterfield.com
+  path: /
+  port:
+    targetPort: https
+  to:
+    kind: Service
+    name: vault-ui
+  tls:
+    termination: passthrough
+    insecureEdgeTerminationPolicy: Redirect
