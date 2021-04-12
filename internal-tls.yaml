@@ -7,7 +7,8 @@ spec:
   secretName: internal-vault-tls
   subject:
     organizations:
-    - Open Cluster Management
+    - open-cluster-management.io
+    - red-chesterfield.com
   usages:
     - server auth
     - client auth
@@ -15,12 +16,6 @@ spec:
     - vault
     - vault.vault.svc
     - vault.vault.svc.cluster.local
-    - vault-0.vault-internal
-    - vault-1.vault-internal
-    - vault-2.vault-internal
-    - vault-0.vault-internal.vault.svc
-    - vault-1.vault-internal.vault.svc
-    - vault-2.vault-internal.vault.svc
     - vault-0.vault-internal.vault.svc.cluster.local
     - vault-1.vault-internal.vault.svc.cluster.local
     - vault-2.vault-internal.vault.svc.cluster.local

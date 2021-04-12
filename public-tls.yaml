@@ -9,7 +9,8 @@ spec:
   secretName: vault-tls
   subject:
     organizations:
-    - Open Cluster Management
+    - open-cluster-management.io
+    - red-chesterfield.com
   usages:
     - server auth
   dnsNames:
