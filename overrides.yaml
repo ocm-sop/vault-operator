@@ -1,0 +1,225 @@
+# Vault Helm Chart Value Overrides
+global:
+  enabled: true
+  tlsDisable: false
+  openshift: false
+
+injector:
+  enabled: false
+  # Use the Vault K8s Image https://github.com/hashicorp/vault-k8s/
+  # image:
+  #   repository: "hashicorp/vault-k8s"
+  #   tag: "0.9.0"
+
+  # certs:
+  #   secretName: vault-injector-cert
+  #   caBundle: {{ (lookup "v1" "ConfigMap" "vault" "service-ca" ).data.service-ca.crt }}
+  
+  service:
+    annotations:
+      service.beta.openshift.io/serving-cert-secret-name: vault-injector-cert
+
+  extraEnvironmentVars: 
+    AGENT_INJECT_SET_SECURITY_CONTEXT: "false"
+
+  resources:
+      requests:
+        memory: 256Mi
+        cpu: 250m
+      limits:
+        memory: 256Mi
+        cpu: 250m
+
+server:
+
+  image:
+    repository: "hashicorp/vault"
+    tag: "1.7.0"
+
+  # These Resource Limits are in line with node requirements in the
+  # Vault Reference Architecture for a Small Cluster
+  resources:
+    requests:
+      memory: 8Gi
+      cpu: 2000m
+    limits:
+      memory: 16Gi
+      cpu: 2000m
+
+  ingress:
+    enabled: false 
+    annotations:
+      route.openshift.io/termination: passthrough
+    hosts: 
+      - host: vault.apps.openshift-cluster-name.base-domain.tld
+    tls:
+      - secretName: vault-tls
+        host: vault.apps.openshift-cluster-name.base-domain.tld
+
+  route:
+    enabled: false 
+    host: vault.apps.openshift-cluster-name.base-domain.tld
+
+  # extraArgs: ""
+
+
+  # For HA configuration and because we need to manually init the vault,
+  # we need to define custom readiness/liveness Probe settings
+  readinessProbe:
+    enabled: true
+    path: "/v1/sys/health?standbyok=true&sealedcode=204&uninitcode=204"
+  livenessProbe:
+    enabled: true
+    path: "/v1/sys/health?standbyok=true"
+    initialDelaySeconds: 60
+
+  # extraEnvironmentVars is a list of extra environment variables to set with the stateful set. These could be
+  # used to include variables required for auto-unseal.
+  extraEnvironmentVars:
+    VAULT_TLS_SERVER_NAME: "$(HOSTNAME).vault-internal"
+    VAULT_CACERT: "/vault/userconfig/internal-vault-tls/ca.crt"
+    VAULT_CLIENT_CERT: "/vault/userconfig/internal-vault-tls/tls.crt"
+    VAULT_CLIENT_KEY: "/vault/userconfig/internal-vault-tls/tls.key"
+
+
+  extraSecretEnvironmentVars:
+    - envName: AWS_SECRET_ACCESS_KEY
+      secretName: vault-kms-creds
+      secretKey: aws_secret_access_key
+    - envName: AWS_ACCESS_KEY_ID
+      secretName: vault-kms-creds
+      secretKey: aws_access_key_id 
+    - envName: AWS_REGION
+      secretName: vault-kms-creds
+      secretKey: aws_region
+    - envName: VAULT_AWSKMS_SEAL_KEY_ID 
+      secretName: vault-kms-creds
+      secretKey: aws_kms_key_id  
+    - envName: VAULT_SEAL_TYPE
+      secretName: vault-kms-creds
+      secretKey: vault_kms_seal_type
+
+  # extraVolumes is a list of extra volumes to mount. These will be exposed
+  # to Vault in the path `/vault/userconfig/<name>/`.
+  extraVolumes:
+    - type: secret
+      name: internal-vault-tls
+
+  # extraInitContainers:
+  #   - name: init-vault-plugin-secrets-github
+  #     image: busybox
+  #     command: ['sh', '-c', 'wget -O /vault/userconfig/plugins/vault-plugin-secrets-github https://github.com/martinbaillie/vault-plugin-secrets-github/releases/download/v1.1.0/vault-plugin-secrets-github-linux-amd64', 'chmod 755 /vault/userconfig/plugins/vault-plugin-secrets-github']
+    
+  volumes:
+    - name: plugins
+      emptyDir: {}
+
+  volumeMounts:
+    - mountPath: /vault/userconfig/
+      name: plugins
+
+  # This configures the Vault Statefulset to create a PVC for audit logs.
+  # See https://www.vaultproject.io/docs/audit/index.html to know more
+  auditStorage:
+    enabled: true
+
+  standalone:
+    enabled: false
+
+  # annotations: >
+  #   service.beta.openshift.io/inject-cabundle: "true"
+
+  service:
+    type: LoadBalancer
+    # annotations:
+    #   service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    # annotations: >
+    #   {{- $service := .Template.Name -}}
+    #   service.beta.openshift.io/serving-cert-secret-name: {{ printf "%s" (base $service) | replace "/" "-" | replace ".yaml" "" | lower }}
+
+  # Run Vault in "HA" mode.
+  ha:
+    enabled: true
+    replicas: 3
+    raft:
+      enabled: true
+      setNodeId: true
+
+      config: |
+        ui = true
+        plugin_directory = "/vault/userconfig/plugins/"
+
+        listener "tcp" {
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+          tls_ca_cert_file = "/vault/userconfig/internal-vault-tls/ca.crt"
+          tls_cert_file = "/vault/userconfig/internal-vault-tls/tls.crt"
+          tls_key_file = "/vault/userconfig/internal-vault-tls/tls.key"
+        }
+
+        storage "raft" {
+          path = "/vault/data"
+
+          retry_join {
+            leader_api_addr = "https://vault-0.vault-internal.vault.svc.cluster.local:8200"
+            leader_ca_cert_file = "/vault/userconfig/internal-vault-tls/ca.crt"
+            leader_client_cert_file = "/vault/userconfig/internal-vault-tls/tls.crt"
+            leader_client_key_file = "/vault/userconfig/internal-vault-tls/tls.key"
+          }
+
+          retry_join {
+            leader_api_addr = "https://vault-1.vault-internal.vault.svc.cluster.local:8200"
+            leader_ca_cert_file = "/vault/userconfig/internal-vault-tls/ca.crt"
+            leader_client_cert_file = "/vault/userconfig/internal-vault-tls/tls.crt"
+            leader_client_key_file = "/vault/userconfig/internal-vault-tls/tls.key"
+          }
+
+          retry_join {
+            leader_api_addr = "https://vault-2.vault-internal.vault.svc.cluster.local:8200"
+            leader_ca_cert_file = "/vault/userconfig/internal-vault-tls/ca.crt"
+            leader_client_cert_file = "/vault/userconfig/internal-vault-tls/tls.crt"
+            leader_client_key_file = "/vault/userconfig/internal-vault-tls/tls.key"
+          }
+        }
+
+        log_level = "debug"
+
+        service_registration "kubernetes" {}
+
+      disruptionBudget:
+        enabled: true
+
+  affinity: |
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: vault
+              app.kubernetes.io/instance: vault
+              component: server
+          topologyKey: failure-domain.beta.kubernetes.io/zone 
+
+  serviceAccount:
+    create: true
+    name: vault-sa
+
+
+# Vault UI
+ui:
+  enabled: true
+  publishNotReadyAddresses: true
+  activeVaultPodOnly: false
+  serviceType: "LoadBalancer"
+  serviceNodePort: null
+  externalPort: 8200
+
+  # annotations:
+  #   service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+
+  # For Added Security, edit the below
+  #loadBalancerSourceRanges:
+  #   - < Your IP RANGE Ex. 10.0.0.0/16 >
+  #   - < YOUR SINGLE IP Ex. 1.78.23.3/32 >
+
+csi:
+  enabled: false 

@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: vault
+  namespace: vault
+  annotations:
+    cert-manager.io/cluster-issuer: psi
+    kubernetes.io/ingress.class: haproxy
+    kubernetes.io/tls-acme: 'true'
+    route.openshift.io/termination: reencrypt
+    cert-utils-operator.redhat-cop.io/destinationCA-from-secret: internal-vault-tls
+    cert-utils-operator.redhat-cop.io/certs-from-secret: vault-tls
+  labels:
+    app: vault
+    use-dns01-solver: "true"
+spec:
+  rules:
+  - host: vault.apps.openshift-cluster-name.base-domain.tld
+    http:
+      paths:
+      - backend:
+          serviceName: vault-ui
+          servicePort: 8200
+        path: /
+  tls:
+  - hosts: 
+    - vault.apps.openshift-cluster-name.base-domain.tld
+    secretName: vault-tls

@@ -1,0 +1,15 @@
+apiVersion: dex.betssongroup.com/v1
+kind: Client
+metadata:
+  name: vault-client
+  namespace: sso
+spec:
+  name: vault client
+  secret: thisreallyshouldbecomingfromvault
+  public: false
+  redirectURIs:
+    - "https://vault.apps.openshift-cluster-name.base-domain.tld/ui/vault/auth/oidc/oidc/callback"
+    - "http://localhost:8250/oidc/callback"
+    - "http://127.0.0.1:8250/oidc/callback"
+  trustedPeers:
+    - ocp-host-cluster
