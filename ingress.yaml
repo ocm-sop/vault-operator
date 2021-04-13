@@ -8,8 +8,8 @@ metadata:
     kubernetes.io/ingress.class: haproxy
     kubernetes.io/tls-acme: 'true'
     route.openshift.io/termination: reencrypt
-    cert-utils-operator.redhat-cop.io/destinationCA-from-secret: internal-vault-tls
-    cert-utils-operator.redhat-cop.io/certs-from-secret: vault-tls
+    cert-utils-operator.redhat-cop.io/destinationCA-from-secret: private-vault-tls
+    cert-utils-operator.redhat-cop.io/certs-from-secret: public-vault-tls
   labels:
     app: vault
     use-dns01-solver: "true"
