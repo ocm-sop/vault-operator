@@ -19,7 +19,7 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: vault-ui
+          serviceName: vault-active
           servicePort: https
         path: /
   tls:

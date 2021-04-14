@@ -211,7 +211,7 @@ server:
 
 # Vault UI
 ui:
-  enabled: true
+  enabled: false
   publishNotReadyAddresses: true
   activeVaultPodOnly: false
   serviceType: "ClusterIP"
