@@ -36,6 +36,9 @@ server:
     repository: "hashicorp/vault"
     tag: "1.7.0"
 
+  logLevel: "info"
+  logFormat: standard 
+
   # These Resource Limits are in line with node requirements in the
   # Vault Reference Architecture for a Small Cluster
   resources:
@@ -130,7 +133,9 @@ server:
   #   service.beta.openshift.io/inject-cabundle: "true"
 
   service:
-    type: LoadBalancer
+    type: ClusterIP
+    ClusterIP: None
+    # type: LoadBalancer
     # annotations:
     #   service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
     # annotations: >
@@ -209,7 +214,7 @@ ui:
   enabled: true
   publishNotReadyAddresses: true
   activeVaultPodOnly: false
-  serviceType: "LoadBalancer"
+  serviceType: "ClusterIP"
   serviceNodePort: null
   externalPort: 8200
 
