@@ -4,7 +4,7 @@ metadata:
   name: vault
   namespace: vault
   annotations:
-    cert-manager.io/cluster-issuer: psi
+    cert-manager.io/cluster-issuer: public-issuer
     kubernetes.io/ingress.class: haproxy
     kubernetes.io/tls-acme: 'true'
     route.openshift.io/termination: reencrypt
@@ -19,10 +19,10 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: vault-ui
-          servicePort: 8200
+          serviceName: vault-active
+          servicePort: https
         path: /
   tls:
   - hosts: 
     - vault.apps.openshift-cluster-name.base-domain.tld
-    secretName: vault-tls
+    secretName: public-vault-tls

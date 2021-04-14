@@ -12,8 +12,18 @@ helmChartInflationGenerator:
   releaseNamespace: vault
   values: overrides.yaml
 
+secretGenerator:
+  - name: vault-kms-creds
+    namespace: vault
+    type: "Opaque"
+    literals:
+      - aws_access_key_id=MY_AWS_ACCESS_KEY_ID
+      - aws_secret_access_key=MY_VERY_LONG_AND_WRONG_AWS_SECRET_ACCESS_KEY
+      - aws_region=us-east-1
+      - aws_kms_key_id=MY_KMS_KEY_ID
+      - vault_kms_seal_type=awskms
+
 
 resources:
 - rbac.yaml
-- aws-kms-secret.yaml
 - ingress.yaml 

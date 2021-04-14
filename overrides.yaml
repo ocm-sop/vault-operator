@@ -51,17 +51,17 @@ server:
 
   ingress:
     enabled: false 
-    annotations:
-      route.openshift.io/termination: passthrough
-    hosts: 
-      - host: vault.apps.openshift-cluster-name.base-domain.tld
-    tls:
-      - secretName: public-vault-tls
-        host: vault.apps.openshift-cluster-name.base-domain.tld
+    # annotations:
+    #   route.openshift.io/termination: passthrough
+    # hosts: 
+    #   - host: vault.apps.openshift-cluster-name.base-domain.tld
+    # tls:
+    #   - secretName: public-vault-tls
+    #     host: vault.apps.openshift-cluster-name.base-domain.tld
 
   route:
     enabled: false 
-    host: vault.apps.openshift-cluster-name.base-domain.tld
+    # host: vault.apps.openshift-cluster-name.base-domain.tld
 
   # extraArgs: ""
 
@@ -211,12 +211,12 @@ server:
 
 # Vault UI
 ui:
-  enabled: true
-  publishNotReadyAddresses: true
-  activeVaultPodOnly: false
-  serviceType: "ClusterIP"
-  serviceNodePort: null
-  externalPort: 8200
+  enabled: false
+  # publishNotReadyAddresses: true
+  # activeVaultPodOnly: false
+  # serviceType: "ClusterIP"
+  # serviceNodePort: null
+  # externalPort: 8200
 
   # annotations:
   #   service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
