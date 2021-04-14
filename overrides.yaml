@@ -211,12 +211,12 @@ server:
 
 # Vault UI
 ui:
-  enabled: false
-  # publishNotReadyAddresses: true
-  # activeVaultPodOnly: false
-  # serviceType: "ClusterIP"
-  # serviceNodePort: null
-  # externalPort: 8200
+  enabled: true
+  publishNotReadyAddresses: true
+  activeVaultPodOnly: false
+  serviceType: "ClusterIP"
+  serviceNodePort: null
+  externalPort: 8200
 
   # annotations:
   #   service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
