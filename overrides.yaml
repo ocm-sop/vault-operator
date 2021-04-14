@@ -80,9 +80,9 @@ server:
   # used to include variables required for auto-unseal.
   extraEnvironmentVars:
     VAULT_TLS_SERVER_NAME: "$(HOSTNAME).vault-internal"
-    VAULT_CACERT: "/vault/userconfig/internal-vault-tls/ca.crt"
-    VAULT_CLIENT_CERT: "/vault/userconfig/internal-vault-tls/tls.crt"
-    VAULT_CLIENT_KEY: "/vault/userconfig/internal-vault-tls/tls.key"
+    VAULT_CACERT: "/vault/userconfig/private-vault-tls/ca.crt"
+    VAULT_CLIENT_CERT: "/vault/userconfig/private-vault-tls/tls.crt"
+    VAULT_CLIENT_KEY: "/vault/userconfig/private-vault-tls/tls.key"
 
 
   extraSecretEnvironmentVars:
@@ -157,9 +157,9 @@ server:
         listener "tcp" {
           address = "[::]:8200"
           cluster_address = "[::]:8201"
-          tls_ca_cert_file = "/vault/userconfig/internal-vault-tls/ca.crt"
-          tls_cert_file = "/vault/userconfig/internal-vault-tls/tls.crt"
-          tls_key_file = "/vault/userconfig/internal-vault-tls/tls.key"
+          tls_ca_cert_file = "/vault/userconfig/private-vault-tls/ca.crt"
+          tls_cert_file = "/vault/userconfig/private-vault-tls/tls.crt"
+          tls_key_file = "/vault/userconfig/private-vault-tls/tls.key"
         }
 
         storage "raft" {
@@ -167,23 +167,23 @@ server:
 
           retry_join {
             leader_api_addr = "https://vault-0.vault-internal.vault.svc.cluster.local:8200"
-            leader_ca_cert_file = "/vault/userconfig/internal-vault-tls/ca.crt"
-            leader_client_cert_file = "/vault/userconfig/internal-vault-tls/tls.crt"
-            leader_client_key_file = "/vault/userconfig/internal-vault-tls/tls.key"
+            leader_ca_cert_file = "/vault/userconfig/private-vault-tls/ca.crt"
+            leader_client_cert_file = "/vault/userconfig/private-vault-tls/tls.crt"
+            leader_client_key_file = "/vault/userconfig/private-vault-tls/tls.key"
           }
 
           retry_join {
             leader_api_addr = "https://vault-1.vault-internal.vault.svc.cluster.local:8200"
-            leader_ca_cert_file = "/vault/userconfig/internal-vault-tls/ca.crt"
-            leader_client_cert_file = "/vault/userconfig/internal-vault-tls/tls.crt"
-            leader_client_key_file = "/vault/userconfig/internal-vault-tls/tls.key"
+            leader_ca_cert_file = "/vault/userconfig/private-vault-tls/ca.crt"
+            leader_client_cert_file = "/vault/userconfig/private-vault-tls/tls.crt"
+            leader_client_key_file = "/vault/userconfig/private-vault-tls/tls.key"
           }
 
           retry_join {
             leader_api_addr = "https://vault-2.vault-internal.vault.svc.cluster.local:8200"
-            leader_ca_cert_file = "/vault/userconfig/internal-vault-tls/ca.crt"
-            leader_client_cert_file = "/vault/userconfig/internal-vault-tls/tls.crt"
-            leader_client_key_file = "/vault/userconfig/internal-vault-tls/tls.key"
+            leader_ca_cert_file = "/vault/userconfig/private-vault-tls/ca.crt"
+            leader_client_cert_file = "/vault/userconfig/private-vault-tls/tls.crt"
+            leader_client_key_file = "/vault/userconfig/private-vault-tls/tls.key"
           }
         }
 
