@@ -23,7 +23,6 @@ secretGenerator:
       - aws_kms_key_id=MY_KMS_KEY_ID
       - vault_kms_seal_type=awskms
 
-
 resources:
 - rbac.yaml
 - ingress.yaml 
