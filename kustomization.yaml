@@ -4,9 +4,6 @@ kind: Component
 generatorOptions:
   disableNameSuffixHash: true
 
-components:
-  - github.com/ocm-sop/apps-domain-tls-cert?ref=main
-
 helmChartInflationGenerator:
 - chartName: vault
   chartRepoUrl: https://helm.releases.hashicorp.com
